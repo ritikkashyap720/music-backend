@@ -13,5 +13,6 @@ var corsOptions = {
 
 app.use(cors(corsOptions));
 app.use("/",router)
+app.get("/start-server/start",(req,res)=>{res.send("Server started")})
 
 app.listen(PORT, () => { console.log(`Server started at http://localhost:${PORT}`) });
