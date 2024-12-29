@@ -30,10 +30,10 @@ async function getSongDetails(req, res) {
                 const audioFormats = ytdl.filterFormats(videoInfo.formats, "audioonly");
                 res.json({ "audio": audioFormats })
             } catch (error) {
-                res.status(500).send('Error streaming audio');
+                res.status(500).json({'Error streaming audio':error});
             }
         } catch (error) {
-            res.status(500).send('Error streaming audio');
+            res.status(500).json({'Error streaming audio':error});
         }
     }
 }
