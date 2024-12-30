@@ -33,7 +33,7 @@ async function getSongDetails(req, res) {
                 res.status(500).json({'Error streaming audio':error});
             }
         } catch (error) {
-            res.status(500).json({'Error streaming audio':error});
+            res.status(500).json({'Error validating videoId':error});
         }
     }
 }
