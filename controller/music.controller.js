@@ -27,8 +27,8 @@ async function getSongDetails(req, res) {
             res.setHeader('Content-Type', 'audio/mpeg');
             try {
                 const videoInfo = await ytdl.getInfo(videoUrl);
-                const audioFormats = ytdl.filterFormats(videoInfo.formats, "audioonly");
-                res.json({ "audio": audioFormats })
+                // const audioFormats = ytdl.filterFormats(videoInfo.formats, "audioonly");
+                res.json({ "audio": videoInfo })
             } catch (error) {
                 res.status(500).json({'Error streaming audio':error});
             }
