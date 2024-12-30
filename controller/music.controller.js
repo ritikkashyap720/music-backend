@@ -1,5 +1,5 @@
 const YoutubeMusicApi = require('youtube-music-api');
-const ytdl = require('ytdl-core');
+const ytdl = require("@distube/ytdl-core");
 const api = new YoutubeMusicApi()
 
 function getSearch(req, res) {
