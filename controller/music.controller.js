@@ -1,47 +1,59 @@
-const YoutubeMusicApi = require('youtube-music-api');
+const {
+    getMusicBasedSuggestions,
+    searchForMusic,
+    searchForAlbums,
+    searchForArtists,
+    listMusicFromAlbum
+} = require("youtube-music-apis");
+
 const ytdl = require("@distube/ytdl-core");
-const api = new YoutubeMusicApi()
 
-function getSearch(req, res) {
+async function getSearch(req, res) {
     const { search } = req.params;
-
-    api.initalize() // Retrieves Innertube Config
-        .then(() => {
-            api.search(search, "song").then(result => res.json(result.content)) // just search for songs
-        })
+    const music = (await searchForMusic(search));
+    res.json(music)
 }
 
 async function getSongDetails(req, res) {
-    {
-        const { videoId } = req.params;
-        if (!videoId) {
-            return res.status(400).send('videoId is required');
-        }
-
-        const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-        if (!ytdl.validateURL(videoUrl)) {
-            return res.status(400).send('Invalid videoId');
-        }
-
-        try {
-            res.setHeader('Content-Type', 'audio/mpeg');
-            try {
-                const videoInfo = await ytdl.getInfo(videoUrl);
-                const audioFormats = ytdl.filterFormats(videoInfo.formats, "audioonly");
-                res.json({ "audio": audioFormats })
-            } catch (error) {
-                res.status(500).json({'Error streaming audio':error});
-            }
-        } catch (error) {
-            res.status(500).json({'Error validating videoId':error});
-        }
+    const { videoId } = req.params;
+    if (!videoId) {
+        return res.status(400).send('videoId is required');
     }
+    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    if (!ytdl.validateURL(videoUrl)) {
+        return res.status(400).send('Invalid videoId');
+    }
+    try {
+        res.setHeader('Content-Type', 'audio/mpeg');
+        const videoInfo = await ytdl.getInfo(videoUrl);
+        const audioFormats = ytdl.filterFormats(videoInfo.formats, "audioonly");
+        res.json({ "audio": audioFormats })
+    } catch (error) {
+        res.status(500).json({ 'Error streaming audio': error });
+    }
+
 }
 
-function getSuggestionBySong(req, res) {
-    const { songs } = req.params;
-    api.initalize() // Retrieves Innertube Config
-        .then(info => { api.search(songs, "song").then(result => res.json(result.content)) })
+async function getSuggestionBySong(req, res) {
+    const { songId } = req.params;
+    console.log(songId)
+    const suggestions = await getMusicBasedSuggestions(songId)
+    res.json(suggestions)
+    
+}
+async function getAlbums(req, res) {
+    const {search} =  req.params;
+    console.log(search)
+    const albums = await searchForAlbums(search)
+    res.json(albums)
+    
 }
 
-module.exports = { getSearch, getSongDetails, getSuggestionBySong }
+async function getSongsFromAlbum(req, res) {
+    const { albumId } = req.params;
+    const songsData = await listMusicFromAlbum(artist)
+    res.json(songsData)
+    
+}
+
+module.exports = { getSearch, getSongDetails, getSuggestionBySong,getAlbums,searchForArtists,getSongsFromAlbum}
