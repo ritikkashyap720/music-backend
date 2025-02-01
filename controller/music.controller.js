@@ -3,7 +3,8 @@ const {
     searchForMusic,
     searchForAlbums,
     searchForArtists,
-    listMusicFromAlbum
+    listMusicFromAlbum,
+    getMusic
 } = require("youtube-music-apis");
 
 const ytdl = require("@distube/ytdl-core");
@@ -14,7 +15,7 @@ async function getSearch(req, res) {
     res.json(music)
 }
 
-async function getSongDetails(req, res) {
+async function getAudioStream(req, res) {
     const { videoId } = req.params;
     if (!videoId) {
         return res.status(400).send('videoId is required');
@@ -24,10 +25,11 @@ async function getSongDetails(req, res) {
         return res.status(400).send('Invalid videoId');
     }
     try {
-        res.setHeader('Content-Type', 'audio/mpeg');
-        const videoInfo = await ytdl.getInfo(videoUrl);
-        const audioFormats = ytdl.filterFormats(videoInfo.formats, "audioonly");
-        res.json({ "audio": audioFormats })
+        // const videoInfo = await ytdl.getInfo(videoUrl);
+        // const audioFormats = ytdl.filterFormats(videoInfo.formats, "audioonly");
+        // res.json({ "audio": audioFormats })
+        res.setHeader("Content-Type", "audio/mpeg");
+        ytdl(videoUrl, { filter: "audioonly", quality: "lowestaudio" }).pipe(res);
     } catch (error) {
         res.status(500).json({ 'Error streaming audio': error });
     }
@@ -39,21 +41,29 @@ async function getSuggestionBySong(req, res) {
     console.log(songId)
     const suggestions = await getMusicBasedSuggestions(songId)
     res.json(suggestions)
-    
+
 }
 async function getAlbums(req, res) {
-    const {search} =  req.params;
+    const { search } = req.params;
     console.log(search)
     const albums = await searchForAlbums(search)
     res.json(albums)
-    
+
 }
 
 async function getSongsFromAlbum(req, res) {
     const { albumId } = req.params;
     const songs = await listMusicFromAlbum(albumId)
     res.json(songs)
-    
+
 }
 
-module.exports = { getSearch, getSongDetails, getSuggestionBySong,getAlbums,searchForArtists,getSongsFromAlbum}
+// get details of song
+
+async function getSongInfo(req, res) {
+    const { youtubeId } = req.params;
+    const songDetails = await getMusic(youtubeId)
+    res.json(songDetails)
+}
+
+module.exports = { getSearch, getSongInfo, getAudioStream, getSuggestionBySong, getAlbums, searchForArtists, getSongsFromAlbum }
