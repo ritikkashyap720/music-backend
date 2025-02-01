@@ -51,8 +51,8 @@ async function getAlbums(req, res) {
 
 async function getSongsFromAlbum(req, res) {
     const { albumId } = req.params;
-    const songsData = await listMusicFromAlbum(artist)
-    res.json(songsData)
+    const songs = await listMusicFromAlbum(albumId)
+    res.json(songs)
     
 }
 
