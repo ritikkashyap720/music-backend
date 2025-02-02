@@ -8,7 +8,7 @@ const PORT = 8000 || process.env.PORT;
 require('dotenv').config();
 var corsOptions = {
     // origin: process.env.FRONT_END_URL,
-    origin:"http://localhost:5173",
+    origin:"https://music-6dku.onrender.com",
     optionsSuccessStatus: 200
   }
 
