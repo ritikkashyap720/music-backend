@@ -25,13 +25,28 @@ async function getAudioStream(req, res) {
         return res.status(400).send('Invalid videoId');
     }
     try {
-        // const videoInfo = await ytdl.getInfo(videoUrl);
-        // const audioFormats = ytdl.filterFormats(videoInfo.formats, "audioonly");
-        // res.json({ "audio": audioFormats })
         res.setHeader("Content-Type", "audio/mpeg");
-        ytdl(videoUrl, { filter: "audioonly", quality: "lowestaudio" }).pipe(res);
+        res.setHeader("Transfer-Encoding", "chunked");
+        res.setHeader("Accept-Ranges", "bytes");
+        // Pipe the audio stream directly to the response
+        // const audioStream = ytdl(videoUrl, { filter: "audioonly",quality:"highestaudio" });
+
+        // audioStream.on("error", (err) => {
+        //     console.error("Streaming error:", err);
+        //     res.status(500).json({ error: "Error streaming audio", details: err.message });
+        // });
+
+        // // Process audio using FFmpeg
+        // audioStream.pipe(res);
+
+        const videoInfo = await ytdl.getInfo(videoUrl);
+        const audioFormats = ytdl.filterFormats(videoInfo.formats, "audioonly");
+        const song = audioFormats.filter((song, i) => song.audioQuality == "AUDIO_QUALITY_MEDIUM")
+        res.json({ "audio": song[1] })
+
     } catch (error) {
-        res.status(500).json({ 'Error streaming audio': error });
+        console.log(error)
+        res.status(500).json({ error: "Error streaming audio", details: error.message });
     }
 
 }
