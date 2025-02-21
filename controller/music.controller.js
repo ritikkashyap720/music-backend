@@ -11,12 +11,14 @@ const ytdl = require("@distube/ytdl-core");
 
 async function getSearch(req, res) {
     const { search } = req.params;
-    const music = (await searchForMusic(search));
+    const music = await searchForMusic(search);
     res.json(music)
+
 }
 
 async function getAudioStream(req, res) {
     const { videoId } = req.params;
+    console.log(new Date().toTimeString());
     if (!videoId) {
         return res.status(400).send('videoId is required');
     }
@@ -26,22 +28,11 @@ async function getAudioStream(req, res) {
     }
     try {
         res.setHeader("Content-Type", "audio/mpeg");
-        res.setHeader("Transfer-Encoding", "chunked");
-        res.setHeader("Accept-Ranges", "bytes");
-        // Pipe the audio stream directly to the response
-        // const audioStream = ytdl(videoUrl, { filter: "audioonly",quality:"highestaudio" });
-
-        // audioStream.on("error", (err) => {
-        //     console.error("Streaming error:", err);
-        //     res.status(500).json({ error: "Error streaming audio", details: err.message });
-        // });
-
-        // // Process audio using FFmpeg
-        // audioStream.pipe(res);
-
         const videoInfo = await ytdl.getInfo(videoUrl);
         const audioFormats = ytdl.filterFormats(videoInfo.formats, "audioonly");
+        // console.log(audioFormats);
         const song = audioFormats.filter((song, i) => song.audioQuality == "AUDIO_QUALITY_MEDIUM")
+        console.log(new Date().toTimeString());
         res.json({ "audio": song[1] })
 
     } catch (error) {
